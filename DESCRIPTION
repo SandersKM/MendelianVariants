@@ -9,3 +9,14 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports:
+  GenomicScores,
+  phastCons100way.UCSC.hg19,
+  fitCons.UCSC.hg19,
+  httr,
+  jsonlite,
+  biomaRt,
+  GenomeGraphs,
+  rentrez,
+  XML,
+  rvest

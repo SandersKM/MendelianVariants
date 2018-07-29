@@ -1,11 +1,3 @@
-suppressPackageStartupMessages(library(GenomicScores))
-suppressPackageStartupMessages(library(phastCons100way.UCSC.hg19))
-suppressPackageStartupMessages(library(fitCons.UCSC.hg19))
-library(httr)
-library(jsonlite)
-library(biomaRt)
-library(GenomeGraphs)
-
 removeUnwantedVariants <- function(df, unwanted_annotations = c("splice region", "synonymous", "3' UTR", "5' UTR", "downstream gene",
                                                                 "intron", "upstream gene", "non coding transcript exon"),
                                    unwanted_flags = c("SEGDUP", "LC LoF")) {

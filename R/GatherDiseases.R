@@ -1,6 +1,3 @@
-library(rentrez)
-library(XML)
-
 gatherDiseases <- function(keyword) {
   disease.search.count <- entrez_search(db = "medgen", term = keyword, retmax = 0)$count
   disease.search <- entrez_search(db = "medgen", term = keyword, retmax = disease.search.count)
@@ -20,7 +17,7 @@ gatherDiseases <- function(keyword) {
   for (i in 1:dim(disease_file)[1]) {
     rownum <- match(xmlValue(disease_gene_by_id[i][[1]]$file[2]$IdList[1]$Id[1]$text), disease_file$id)
     disease_file$genes[rownum] <- paste0(disease_gene_by_id[i][[1]]$links$medgen_gene_diseases, collapse = "; ")
-    disease_file$genes_symbol[rownum] <- paste0(disease_genes_symbols["name", disease_gene_by_id[i][[1]]$links$medgen_gene_diseases], 
+    disease_file$genes_symbol[rownum] <- paste0(disease_genes_symbols["name", disease_gene_by_id[i][[1]]$links$medgen_gene_diseases],
                                                 collapse = "; ")
   }
   # take out diseases without associated genes
