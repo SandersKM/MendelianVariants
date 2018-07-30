@@ -3,13 +3,6 @@ Package for finding Mendelian disease, related genes, and potentially pathogenic
 
 ## Installation Instructions
 
-First, you will need to install a few Bioconductor dependencies for scoring variants. These take a little while to install. 
-
-```R
-source("https://bioconductor.org/biocLite.R")
-biocLite("fitCons.UCSC.hg19")
-biocLite("phastCons100way.UCSC.hg19")
-biocLite("GenomicScores")
 ```
 If you don't already have devtools installed:
 
@@ -20,5 +13,6 @@ install.packages("devtools")
 Now you are ready to install this package!
 
 ```R
-
+library(devtools)
+install_github("sanderskm/MendelianVariants")
 ```
