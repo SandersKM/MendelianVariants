@@ -14,6 +14,7 @@ biocViews:
 Imports:
   GenomeInfoDbData,
   GenomicRanges,
+  IRanges,
   DelayedArray,
   GenomicScores,
   httr,
