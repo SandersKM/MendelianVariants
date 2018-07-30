@@ -76,82 +76,86 @@ gatherGenes <- function(disease_file){
 
 
 
-addHumanProteinAtlasInfo <- function(gene_file){
-  gene_file$hpa.url <- sapply(gene_file$ensembl_gene_id, function(x){
-    if(!is.logical(x)){
-      # if there is > 1 ensembl_gene_id, I am just using the first.
-      if(length(x) > 1){
-        paste("https://www.proteinatlas.org/",x[[1]],"/tissue/kidney", sep = "")
-      }
-      else{
-        paste("https://www.proteinatlas.org/",x,"/tissue/kidney", sep = "")
-      }
-    }
-  })
 
-  gene_file$page <- sapply(gene_file$hpa.url, function(x){
-    if(!is.null(x)){
-      tryCatch({read_html(x)},
-               error = function(e){
-                 return(NULL)
-               })
-    }
-  })
-
-  gene_file$hpa.rna.expression <- sapply(gene_file$page, function(x){
-    if(!is.null(x)){
-      x %>% html_nodes("body table.main_table tr div.menu_margin
-                       table.border.dark.round table.noborder.nowrap tr"
-      )}})
-
-  gene_file$hpa.rna.hpa.tpm <- sapply(gene_file$hpa.rna.expression, function(x){
-    if(!is.null(x)){
-      as.list(x[1] %>% html_nodes("td") %>% html_text())[[2]]}})
-  gene_file$hpa.rna.hpa.tpm <- lapply(gene_file$hpa.rna.hpa.tpm, toString)
-  gene_file$hpa.rna.hpa.tpm <- unlist(gene_file$hpa.rna.hpa.tpm)
-
-  gene_file$hpa.rna.gtex.rpkm <- sapply(gene_file$hpa.rna.expression, function(x){
-    if(!is.null(x)){
-      tryCatch({as.list(x[2] %>% html_nodes("td") %>% html_text())[[2]]},
-               error = function(e){
-                 return(NULL)
-               })}})
-  gene_file$hpa.rna.gtex.rpkm <- lapply(gene_file$hpa.rna.gtex.rpkm, toString)
-  gene_file$hpa.rna.gtex.rpkm <- unlist(gene_file$hpa.rna.gtex.rpkm)
-
-  gene_file$hpa.rna.fantom5.tagspermillion <- sapply(gene_file$hpa.rna.expression, function(x){
-    if(!is.null(x)){
-      tryCatch({as.list(x[3] %>% html_nodes("td") %>% html_text())[[2]]},
-               error = function(e){
-                 return(NULL)
-               })}})
-  gene_file$hpa.rna.fantom5.tagspermillion <- lapply(gene_file$hpa.rna.fantom5.tagspermillion, toString)
-  gene_file$hpa.rna.fantom5.tagspermillion <- unlist(gene_file$hpa.rna.fantom5.tagspermillion)
-
-  gene_file$hpa.protein.expression <- sapply(gene_file$page, function(x){
-    if(!is.null(x)){
-      x %>% html_nodes("body table.main_table tr div.menu_margin
-                       table table.dark th.nopadd table.border.dark table.noborder.nowrap tr")
-    }})
-
-  gene_file$hpa.protein.glomeruli <- sapply(gene_file$hpa.protein.expression, function(x){
-    if(!is.null(x)){
-      tryCatch({as.list(x[1] %>% html_nodes("td") %>% html_text)[[2]]},
-               error = function(e){
-                 return(NULL)
-               })}})
-  gene_file$hpa.protein.glomeruli <- lapply(gene_file$hpa.protein.glomeruli, toString)
-  gene_file$hpa.protein.glomeruli <- unlist(gene_file$hpa.protein.glomeruli)
-
-  gene_file$hpa.protein.tubules <- sapply(gene_file$hpa.protein.expression, function(x){
-    if(!is.null(x)){
-      tryCatch({as.list(x[2] %>% html_nodes("td") %>% html_text)[[2]]},
-               error = function(e){
-                 return(NULL)
-               })}})
-  gene_file$hpa.protein.tubules <- lapply(gene_file$hpa.protein.tubules, toString)
-  gene_file$hpa.protein.tubules <- unlist(gene_file$hpa.protein.tubules)
-  gene_file <- gene_file[ , !(names(gene_file) %in% c("page", "hpa.rna.expression",
-                                                      "hpa.protein.expression"))]
-  return(gene_file)
-}
+# gene_file <- genes
+#   gene_file$hpa.url <- sapply(gene_file$ensembl_gene_id, function(x){
+#     if(!is.logical(x)){
+#       # if there is > 1 ensembl_gene_id, I am just using the first.
+#       if(length(x) > 1){
+#         paste("https://www.proteinatlas.org/",x[[1]],"/tissue/kidney", sep = "")
+#       }
+#       else{
+#         paste("https://www.proteinatlas.org/",x,"/tissue/kidney", sep = "")
+#       }
+#     }
+#   })
+#
+#
+#
+#   gene_file$page <- sapply(gene_file$hpa.url, function(x){
+#     if(!is.null(x)){
+#       tryCatch({read_html(x)},
+#                error = function(e){
+#                  return(NULL)
+#                })
+#     }
+#   })
+#   print(gene_file$hpa.page)
+#
+#   gene_file$hpa.rna.expression <- sapply(gene_file$page, function(x){
+#     if(!is.null(x)){
+#       print(x)
+#       x %>% html_nodes("body table.main_table tr div.menu_margin table.border.dark.round table.noborder.nowrap tr"
+#       )}})
+#
+#   print(gene_file$hpa.rna.expression)
+#   gene_file$hpa.rna.hpa.tpm <- sapply(gene_file$hpa.rna.expression, function(x){
+#     if(!is.null(x)){
+#       as.list(x[1] %>% html_nodes("td") %>% html_text())[[2]]}})
+#   gene_file$hpa.rna.hpa.tpm <- lapply(gene_file$hpa.rna.hpa.tpm, toString)
+#   gene_file$hpa.rna.hpa.tpm <- unlist(gene_file$hpa.rna.hpa.tpm)
+#
+#   gene_file$hpa.rna.gtex.rpkm <- sapply(gene_file$hpa.rna.expression, function(x){
+#     if(!is.null(x)){
+#       tryCatch({as.list(x[2] %>% html_nodes("td") %>% html_text())[[2]]},
+#                error = function(e){
+#                  return(NULL)
+#                })}})
+#   gene_file$hpa.rna.gtex.rpkm <- lapply(gene_file$hpa.rna.gtex.rpkm, toString)
+#   gene_file$hpa.rna.gtex.rpkm <- unlist(gene_file$hpa.rna.gtex.rpkm)
+#
+#   gene_file$hpa.rna.fantom5.tagspermillion <- sapply(gene_file$hpa.rna.expression, function(x){
+#     if(!is.null(x)){
+#       tryCatch({as.list(x[3] %>% html_nodes("td") %>% html_text())[[2]]},
+#                error = function(e){
+#                  return(NULL)
+#                })}})
+#   gene_file$hpa.rna.fantom5.tagspermillion <- lapply(gene_file$hpa.rna.fantom5.tagspermillion, toString)
+#   gene_file$hpa.rna.fantom5.tagspermillion <- unlist(gene_file$hpa.rna.fantom5.tagspermillion)
+#
+#   gene_file$hpa.protein.expression <- sapply(gene_file$page, function(x){
+#     if(!is.null(x)){
+#       x %>% html_nodes("body table.main_table tr div.menu_margin table table.dark th.nopadd table.border.dark table.noborder.nowrap tr")
+#     }})
+#
+#   gene_file$hpa.protein.glomeruli <- sapply(gene_file$hpa.protein.expression, function(x){
+#     if(!is.null(x)){
+#       tryCatch({as.list(x[1] %>% html_nodes("td") %>% html_text)[[2]]},
+#                error = function(e){
+#                  return(NULL)
+#                })}})
+#   gene_file$hpa.protein.glomeruli <- lapply(gene_file$hpa.protein.glomeruli, toString)
+#   gene_file$hpa.protein.glomeruli <- unlist(gene_file$hpa.protein.glomeruli)
+#
+#   gene_file$hpa.protein.tubules <- sapply(gene_file$hpa.protein.expression, function(x){
+#     if(!is.null(x)){
+#       tryCatch({as.list(x[2] %>% html_nodes("td") %>% html_text)[[2]]},
+#                error = function(e){
+#                  return(NULL)
+#                })}})
+#   gene_file$hpa.protein.tubules <- lapply(gene_file$hpa.protein.tubules, toString)
+#   gene_file$hpa.protein.tubules <- unlist(gene_file$hpa.protein.tubules)
+#   gene_file <- gene_file[ , !(names(gene_file) %in% c("page", "hpa.rna.expression",
+#                                                       "hpa.protein.expression"))]
+#
+#
