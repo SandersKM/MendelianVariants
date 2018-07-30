@@ -1,7 +1,5 @@
 exportPattern("^[[:alpha:]]+")
 import(GenomicScores)
-import(phastCons100way.UCSC.hg19)
-import(fitCons.UCSC.hg19)
 import(httr)
 import(jsonlite)
 import(biomaRt)
