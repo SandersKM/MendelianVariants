@@ -101,12 +101,12 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
 
   # phastCons100way.UCSC.hg19 - phastCon scores are derived from the alignment of the human genome (hg19)
   # and 99 other vertabrate species
-  phastCon.scores <- scores(phastCons100way.UCSC.hg19, gr)
+  phastCon.scores <- gscores(phastCons100way.UCSC.hg19, gr)
   df$phastCon.score <- phastCon.scores[df$distance.from.start]$scores
 
   # fitCons.UCSC.hg19 - fitCons scores measure the fitness consequences of function annotation for the
   # human genome (hg19)
-  fitCon.scores <- scores(fitCons.UCSC.hg19, gr)
+  fitCon.scores <- gscores(fitCons.UCSC.hg19, gr)
   df$fitCon.score <- fitCon.scores[df$distance.from.start]$scores
 
   # This is to get the position of the scores for GScores where there are multiple allele options
@@ -122,7 +122,7 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
     cadd <- getGScores("cadd.v1.3.hg19")
   }
 
-  cadd.scores <- scores(cadd, gr)
+  cadd.scores <- gscores(cadd, gr)
   df$cadd.score <- sapply(1:dim(df)[1], function(n){
     if(is.na(df$temp[n])){return(NULL)}
     if(df$temp[n] == 1){
@@ -144,7 +144,7 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
     mcap <- getGScores("mcap.v1.0.hg19")
   }
 
-  mcap.scores <- scores(mcap, gr)
+  mcap.scores <- gscores(mcap, gr)
   df$mcap.score <- sapply(1:dim(df)[1], function(n){
     if(is.na(df$temp[n])){return(NULL)}
     if(df$temp[n] == 1){
