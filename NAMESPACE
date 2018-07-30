@@ -1,6 +1,7 @@
 exportPattern("^[[:alpha:]]+")
 
 import(GenomeInfoDbData) 
+import(DelayedArray)
 import(GenomicScores)
 import(httr)
 import(jsonlite)
