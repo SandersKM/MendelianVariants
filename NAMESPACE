@@ -1,6 +1,7 @@
 exportPattern("^[[:alpha:]]+")
 
 import(GenomeInfoDbData) 
+import(stringi)
 import(GenomicRanges)
 import(IRanges)
 import(DelayedArray)
