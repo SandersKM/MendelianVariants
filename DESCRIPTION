@@ -13,8 +13,6 @@ Depends: R (>= 3.4)
 biocViews:
 Imports:
   GenomicScores,
-  phastCons100way.UCSC.hg19,
-  fitCons.UCSC.hg19,
   httr,
   jsonlite,
   biomaRt,
@@ -22,3 +20,6 @@ Imports:
   rentrez,
   XML,
   rvest
+Suggests:
+  phastCons100way.UCSC.hg19,
+  fitCons.UCSC.hg19
