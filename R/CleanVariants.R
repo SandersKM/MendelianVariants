@@ -21,7 +21,6 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   try({
     api.response <- fromJSON(paste("http://grch37.rest.ensembl.org/lookup/symbol/homo_sapiens/", gene.of.interest.symbol,
                                    "?content-type=application/json;expand=1", sep = ""))
-
     gene.of.interest.ensembl_gene_id <- api.response$id
     gene.of.interest.start <- api.response$start
     gene.of.interest.end <- api.response$end
@@ -32,8 +31,7 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
     gene.of.interest.cannonical_transcript <- transcripts$Transcript.id[canonical.rownum]
     gene.of.interest.exon <- cbind(transcripts$Transcript.Exon[canonical.rownum][[1]]$start,
                                    transcripts$Transcript.Exon[canonical.rownum][[1]]$end)
-  }, silent = TRUE)
-
+  }, silent = FALSE)
   # find the cannonical exon (if any) each variant falls into
   df$exon <- sapply(df$Position, function(position){
     closest_exon <- 0
@@ -97,8 +95,13 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
     phastCon <<- getGScores("phastCons100way.UCSC.hg19")
   }
 
-  phastCon.scores <- gscores(phastCon, gr)
-  df$phastCon.score <- phastCon.scores[df$distance.from.start]$default
+  tryCatch({phastCon.scores <<- gscores(phastCon, gr)
+    df$phastCon.score <<- phastCon.scores[df$distance.from.start]$default
+  },error = function(e){
+    phastCon.scores <<- scores(phastCon, gr)
+    df$phastCon.score <<- phastCon.scores[df$distance.from.start]$scores
+  })
+
 
   # fitCons.UCSC.hg19 - fitCons scores measure the fitness consequences of function annotation for the
   # human genome (hg19)
@@ -106,8 +109,13 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if(!exists("fitCon")){
     fitCon <<- getGScores("fitCons.UCSC.hg19")
   }
-  fitCon.scores <- gscores(fitCon, gr)
-  df$fitCon.score <- fitCon.scores[df$distance.from.start]$default
+  tryCatch({fitCon.scores <<- gscores(fitCon, gr)
+  df$fitCon.score <<- fitCon.scores[df$distance.from.start]$default
+  },error = function(e){
+    fitCon.scores <<- scores(fitCon, gr)
+    df$fitCon.score <<- fitCon.scores[df$distance.from.start]$scores
+  })
+
 
   # This is to get the position of the scores for GScores where there are multiple allele options
   alleles <- c("A", "C", "G", "T")
@@ -121,20 +129,35 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if (!exists("cadd")){
     cadd <<- getGScores("cadd.v1.3.hg19")
   }
-
-  cadd.scores <- gscores(cadd, gr)
-  df$cadd.score <- sapply(1:dim(df)[1], function(n){
-    if(is.na(df$temp[n])){return(NULL)}
-    if(df$temp[n] == 1){
-      return(cadd.scores[df$distance.from.start[n]]$default[1])
-    }
-    if(df$temp[n] == 2){
-      return(cadd.scores[df$distance.from.start[n]]$default[2])
-    }
-    if(df$temp[n] == 3){
-      return(cadd.scores[df$distance.from.start[n]]$default[3])
-    }
+  tryCatch({cadd.scores <<- gscores(cadd, gr)
+    df$cadd.score <<- sapply(1:dim(df)[1], function(n){
+      if(is.na(df$temp[n])){return(NULL)}
+      if(df$temp[n] == 1){
+        return(cadd.scores[df$distance.from.start[n]]$default[1])
+      }
+      if(df$temp[n] == 2){
+        return(cadd.scores[df$distance.from.start[n]]$default[2])
+      }
+      if(df$temp[n] == 3){
+        return(cadd.scores[df$distance.from.start[n]]$default[3])
+      }
+  })},
+  error = function(e){
+    cadd.scores <<- scores(cadd, gr)
+    df$cadd.score <<- sapply(1:dim(df)[1], function(n){
+      if(is.na(df$temp[n])){return(NULL)}
+      if(df$temp[n] == 1){
+        return(cadd.scores[df$distance.from.start[n]]$scores1[1])
+      }
+      if(df$temp[n] == 2){
+        return(cadd.scores[df$distance.from.start[n]]$scores2[1])
+      }
+      if(df$temp[n] == 3){
+        return(cadd.scores[df$distance.from.start[n]]$scores3[1])
+      }
+    })
   })
+
   df$cadd.score <- lapply(df$cadd.score , toString)
   df$cadd.score <- unlist(df$cadd.score)
   df$cadd.score <- lapply(df$cadd.score, as.integer)
@@ -143,20 +166,35 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if (!exists("mcap")){
     mcap <<- getGScores("mcap.v1.0.hg19")
   }
-
-  mcap.scores <- gscores(mcap, gr)
-  df$mcap.score <- sapply(1:dim(df)[1], function(n){
-    if(is.na(df$temp[n])){return(NULL)}
-    if(df$temp[n] == 1){
-      return(mcap.scores[df$distance.from.start[n]]$default[1])
-    }
-    if(df$temp[n] == 2){
-      return(mcap.scores[df$distance.from.start[n]]$default[2])
-    }
-    if(df$temp[n] == 3){
-      return(mcap.scores[df$distance.from.start[n]]$default[3])
-    }
+  tryCatch({mcap.scores <<- gscores(mcap, gr)
+    df$mcap.score <<- sapply(1:dim(df)[1], function(n){
+      if(is.na(df$temp[n])){return(NULL)}
+      if(df$temp[n] == 1){
+        return(mcap.scores[df$distance.from.start[n]]$default[1])
+      }
+      if(df$temp[n] == 2){
+        return(mcap.scores[df$distance.from.start[n]]$default[2])
+      }
+      if(df$temp[n] == 3){
+        return(mcap.scores[df$distance.from.start[n]]$default[3])
+      }
+  })},
+  error = function(e){
+    mcap.scores <<- scores(mcap, gr)
+    df$mcap.score <<- sapply(1:dim(df)[1], function(n){
+      if(is.na(df$temp[n])){return(NULL)}
+      if(df$temp[n] == 1){
+        return(mcap.scores[df$distance.from.start[n]]$scores1[1])
+      }
+      if(df$temp[n] == 2){
+        return(mcap.scores[df$distance.from.start[n]]$scores2[1])
+      }
+      if(df$temp[n] == 3){
+        return(mcap.scores[df$distance.from.start[n]]$scores3[1])
+      }
+    })
   })
+
   df$mcap.score <- lapply(df$mcap.score , toString)
   df$mcap.score <- unlist(df$mcap.score)
   df$mcap.score <- lapply(df$mcap.score, as.numeric)
