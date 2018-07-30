@@ -101,7 +101,7 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
 
   # phastCons100way.UCSC.hg19 - phastCon scores are derived from the alignment of the human genome (hg19)
   # and 99 other vertabrate species
-  if(!exists(phastCon)){
+  if(!exists("phastCon")){
     phastCon <<- getGScores("phastCons100way.UCSC.hg19")
   }
   
@@ -111,7 +111,7 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   # fitCons.UCSC.hg19 - fitCons scores measure the fitness consequences of function annotation for the
   # human genome (hg19)
   
-  if(!exists(fitCon)){
+  if(!exists("fitCon")){
     fitCon <<- getGScores("fitCons.UCSC.hg19")
   }
   fitCon.scores <- gscores(fitCon, gr)
