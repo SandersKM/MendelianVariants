@@ -9,9 +9,9 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4)
 biocViews:
-Imports:
+Depends: 
+  R (>= 3.4),
   GenomeInfoDbData,
   GenomicRanges,
   IRanges,
@@ -24,6 +24,8 @@ Imports:
   GenomeGraphs,
   rentrez,
   XML,
+  xml2,
+  magrittr,
   rvest
 Suggests:
   phastCons100way.UCSC.hg19,
