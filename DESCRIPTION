@@ -10,6 +10,9 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 biocViews:
+  GenomicScores,
+  phastCons100way.UCSC.hg19,
+  fitCons.UCSC.hg19
 Imports:
   GenomicScores,
   phastCons100way.UCSC.hg19,
