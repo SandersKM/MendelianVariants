@@ -83,18 +83,18 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   }
   df$distance.from.start <- sapply(1:dim(df)[1], get_position_offset)
 
-  tryCatch({library(phastCons100way.UCSC.hg19)}, 
-           error = function(e){
-             source("https://bioconductor.org/biocLite.R")
-             biocLite("phastCons100way.UCSC.hg19")
-             library(phastCons100way.UCSC.hg19)
-           })
-  tryCatch({library(fitCons.UCSC.hg19)}, 
-           error = function(e){
-             source("https://bioconductor.org/biocLite.R")
-             biocLite("fitCons.UCSC.hg19")
-             library(fitCons.UCSC.hg19)
-           })
+#  tryCatch({library(phastCons100way.UCSC.hg19)}, 
+#           error = function(e){
+#             source("https://bioconductor.org/biocLite.R")
+#             biocLite("phastCons100way.UCSC.hg19")
+#             library(phastCons100way.UCSC.hg19)
+#           })
+#  tryCatch({library(fitCons.UCSC.hg19)}, 
+#           error = function(e){
+#             source("https://bioconductor.org/biocLite.R")
+#             biocLite("fitCons.UCSC.hg19")
+#             library(fitCons.UCSC.hg19)
+#           })
  
   gr <- GRanges(seqnames=gene.of.interest.ch,
                 IRanges(start=gene.of.interest.start:gene.of.interest.end, width=1))
