@@ -12,6 +12,7 @@ LazyData: true
 Depends: R (>= 3.4)
 biocViews:
 Imports:
+  GenomeInfoDbData,
   GenomicScores,
   httr,
   jsonlite,
