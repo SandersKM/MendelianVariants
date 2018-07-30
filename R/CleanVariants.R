@@ -57,15 +57,7 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
     return(paste(closest_exon, symb, exon_dist, sep = ""))
   })
   df$ancestors <- sapply(1:dim(df)[1], get_ancestors, df = df)
-  drops <- c("Allele.Count.African", "Allele.Number.African", "Homozygote.Count.African",
-             "Allele.Count.Ashkenazi.Jewish", "Allele.Number.Ashkenazi.Jewish", "Homozygote.Count.Ashkenazi.Jewish",
-             "Allele.Count.East.Asian", "Allele.Number.East.Asian", "Homozygote.Count.East.Asian",
-             "Allele.Count.European..Finnish.", "Allele.Number.European..Finnish.", "Homozygote.Count.European..Finnish.",
-             "Allele.Count.European..Non.Finnish.", "Allele.Number.European..Non.Finnish.", "Homozygote.Count.European..Non.Finnish.",
-             "Allele.Count.Latino", "Allele.Number.Latino", "Homozygote.Count.Latino",
-             "Allele.Count.South.Asian", "Allele.Number.South.Asian", "Homozygote.Count.South.Asian",
-             "Allele.Count.Other", "Allele.Number.Other", "Homozygote.Count.Other")
-  df <- df[ , !(names(df) %in% drops)]
+
 
   # function to get gnomAD website for specific variant
   df$gnomAD.website <- sapply(1:dim(df)[1], function(n){
@@ -83,19 +75,19 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   }
   df$distance.from.start <- sapply(1:dim(df)[1], get_position_offset)
 
-#  tryCatch({library(phastCons100way.UCSC.hg19)}, 
+#  tryCatch({library(phastCons100way.UCSC.hg19)},
 #           error = function(e){
 #             source("https://bioconductor.org/biocLite.R")
 #             biocLite("phastCons100way.UCSC.hg19")
 #             library(phastCons100way.UCSC.hg19)
 #           })
-#  tryCatch({library(fitCons.UCSC.hg19)}, 
+#  tryCatch({library(fitCons.UCSC.hg19)},
 #           error = function(e){
 #             source("https://bioconductor.org/biocLite.R")
 #             biocLite("fitCons.UCSC.hg19")
 #             library(fitCons.UCSC.hg19)
 #           })
- 
+
   gr <- GRanges(seqnames=gene.of.interest.ch,
                 IRanges(start=gene.of.interest.start:gene.of.interest.end, width=1))
 
@@ -104,18 +96,18 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if(!exists("phastCon")){
     phastCon <<- getGScores("phastCons100way.UCSC.hg19")
   }
-  
+
   phastCon.scores <- gscores(phastCon, gr)
-  df$phastCon.score <- phastCon.scores[df$distance.from.start]$scores
+  df$phastCon.score <- phastCon.scores[df$distance.from.start]$default
 
   # fitCons.UCSC.hg19 - fitCons scores measure the fitness consequences of function annotation for the
   # human genome (hg19)
-  
+
   if(!exists("fitCon")){
     fitCon <<- getGScores("fitCons.UCSC.hg19")
   }
   fitCon.scores <- gscores(fitCon, gr)
-  df$fitCon.score <- fitCon.scores[df$distance.from.start]$scores
+  df$fitCon.score <- fitCon.scores[df$distance.from.start]$default
 
   # This is to get the position of the scores for GScores where there are multiple allele options
   alleles <- c("A", "C", "G", "T")
@@ -134,13 +126,13 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   df$cadd.score <- sapply(1:dim(df)[1], function(n){
     if(is.na(df$temp[n])){return(NULL)}
     if(df$temp[n] == 1){
-      return(cadd.scores[df$distance.from.start[n]]$scores1[1])
+      return(cadd.scores[df$distance.from.start[n]]$default[1])
     }
     if(df$temp[n] == 2){
-      return(cadd.scores[df$distance.from.start[n]]$scores2[1])
+      return(cadd.scores[df$distance.from.start[n]]$default[2])
     }
     if(df$temp[n] == 3){
-      return(cadd.scores[df$distance.from.start[n]]$scores3[1])
+      return(cadd.scores[df$distance.from.start[n]]$default[3])
     }
   })
   df$cadd.score <- lapply(df$cadd.score , toString)
@@ -156,13 +148,13 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   df$mcap.score <- sapply(1:dim(df)[1], function(n){
     if(is.na(df$temp[n])){return(NULL)}
     if(df$temp[n] == 1){
-      return(mcap.scores[df$distance.from.start[n]]$scores1[1])
+      return(mcap.scores[df$distance.from.start[n]]$default[1])
     }
     if(df$temp[n] == 2){
-      return(mcap.scores[df$distance.from.start[n]]$scores2[1])
+      return(mcap.scores[df$distance.from.start[n]]$default[2])
     }
     if(df$temp[n] == 3){
-      return(mcap.scores[df$distance.from.start[n]]$scores3[1])
+      return(mcap.scores[df$distance.from.start[n]]$default[3])
     }
   })
   df$mcap.score <- lapply(df$mcap.score , toString)
@@ -228,6 +220,16 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   df$consequences.all <- unlist(lapply(df$consequences.all, toString))
   df$sift.prediction <- unlist(lapply(df$sift.prediction, toString))
   df$polyphen.prediction <- unlist(lapply(df$polyphen.prediction, toString))
+
+  drops <- c("Allele.Count.African", "Allele.Number.African", "Homozygote.Count.African",
+             "Allele.Count.Ashkenazi.Jewish", "Allele.Number.Ashkenazi.Jewish", "Homozygote.Count.Ashkenazi.Jewish",
+             "Allele.Count.East.Asian", "Allele.Number.East.Asian", "Homozygote.Count.East.Asian",
+             "Allele.Count.European..Finnish.", "Allele.Number.European..Finnish.", "Homozygote.Count.European..Finnish.",
+             "Allele.Count.European..Non.Finnish.", "Allele.Number.European..Non.Finnish.", "Homozygote.Count.European..Non.Finnish.",
+             "Allele.Count.Latino", "Allele.Number.Latino", "Homozygote.Count.Latino",
+             "Allele.Count.South.Asian", "Allele.Number.South.Asian", "Homozygote.Count.South.Asian",
+             "Allele.Count.Other", "Allele.Number.Other", "Homozygote.Count.Other", "temp")
+  df <- df[ , !(names(df) %in% drops)]
 
   return(df)
 }
