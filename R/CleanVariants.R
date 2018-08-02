@@ -94,13 +94,14 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if(!exists("phastCon")){
     phastCon <<- getGScores("phastCons100way.UCSC.hg19")
   }
-
-  tryCatch({phastCon.scores <<- gscores(phastCon, gr)
-    df$phastCon.score <<- phastCon.scores[df$distance.from.start]$default
-  },error = function(e){
-    phastCon.scores <<- scores(phastCon, gr)
-    df$phastCon.score <<- phastCon.scores[df$distance.from.start]$scores
-  })
+  df$phastCon.score <- score(phastCon, gr)[df$distance.from.start]
+#
+#   tryCatch({phastCon.scores <<- gscores(phastCon, gr)
+#     df$phastCon.score <<- phastCon.scores[df$distance.from.start]$default
+#   },error = function(e){
+#     phastCon.scores <<- scores(phastCon, gr)
+#     df$phastCon.score <<- phastCon.scores[df$distance.from.start]$scores
+#   })
 
 
   # fitCons.UCSC.hg19 - fitCons scores measure the fitness consequences of function annotation for the
@@ -109,13 +110,16 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if(!exists("fitCon")){
     fitCon <<- getGScores("fitCons.UCSC.hg19")
   }
-  tryCatch({fitCon.scores <<- gscores(fitCon, gr)
-  df$fitCon.score <<- fitCon.scores[df$distance.from.start]$default
-  },error = function(e){
-    fitCon.scores <<- scores(fitCon, gr)
-    df$fitCon.score <<- fitCon.scores[df$distance.from.start]$scores
-  })
-
+  df$fitCon.scores <- score(fitCon, gr)[df$distance.from.start]
+  # tryCatch({fitCon.scores <<- gscores(fitCon, gr)
+  #     print(fitCon.scores)
+  #     df$fitCon.score <<- fitCon.scores[df$distance.from.start]$default
+  #     print("YYYYEEEEESSS")
+  # },error = function(e){
+  #   print("NOPE")
+  #   fitCon.scores <<- scores(fitCon, gr)
+  #   df$fitCon.score <<- fitCon.scores[df$distance.from.start]$scores
+  # })
 
   # This is to get the position of the scores for GScores where there are multiple allele options
   alleles <- c("A", "C", "G", "T")
@@ -129,33 +133,46 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if (!exists("cadd")){
     cadd <<- getGScores("cadd.v1.3.hg19")
   }
-  tryCatch({cadd.scores <<- gscores(cadd, gr)
-    df$cadd.score <<- sapply(1:dim(df)[1], function(n){
-      if(is.na(df$temp[n])){return(NULL)}
-      if(df$temp[n] == 1){
-        return(cadd.scores[df$distance.from.start[n]]$default[1])
-      }
-      if(df$temp[n] == 2){
-        return(cadd.scores[df$distance.from.start[n]]$default[2])
-      }
-      if(df$temp[n] == 3){
-        return(cadd.scores[df$distance.from.start[n]]$default[3])
-      }
-  })},
-  error = function(e){
-    cadd.scores <<- scores(cadd, gr)
-    df$cadd.score <<- sapply(1:dim(df)[1], function(n){
-      if(is.na(df$temp[n])){return(NULL)}
-      if(df$temp[n] == 1){
-        return(cadd.scores[df$distance.from.start[n]]$scores1[1])
-      }
-      if(df$temp[n] == 2){
-        return(cadd.scores[df$distance.from.start[n]]$scores2[1])
-      }
-      if(df$temp[n] == 3){
-        return(cadd.scores[df$distance.from.start[n]]$scores3[1])
-      }
-    })
+  # tryCatch({cadd.scores <<- gscores(cadd, gr)
+  #   df$cadd.score <<- sapply(1:dim(df)[1], function(n){
+  #     if(is.na(df$temp[n])){return(NULL)}
+  #     if(df$temp[n] == 1){
+  #       return(cadd.scores[df$distance.from.start[n]]$default[1])
+  #     }
+  #     if(df$temp[n] == 2){
+  #       return(cadd.scores[df$distance.from.start[n]]$default[2])
+  #     }
+  #     if(df$temp[n] == 3){
+  #       return(cadd.scores[df$distance.from.start[n]]$default[3])
+  #     }
+  # })},
+  # error = function(e){
+  #   cadd.scores <<- scores(cadd, gr)
+  #   df$cadd.score <<- sapply(1:dim(df)[1], function(n){
+  #     if(is.na(df$temp[n])){return(NULL)}
+  #     if(df$temp[n] == 1){
+  #       return(cadd.scores[df$distance.from.start[n]]$scores1[1])
+  #     }
+  #     if(df$temp[n] == 2){
+  #       return(cadd.scores[df$distance.from.start[n]]$scores2[1])
+  #     }
+  #     if(df$temp[n] == 3){
+  #       return(cadd.scores[df$distance.from.start[n]]$scores3[1])
+  #     }
+  #   })
+  # })
+  cadd.scores <- score(cadd, gr)[df$distance.from.start,]
+  df$cadd.score <- sapply(1:dim(df)[1], function(n){
+    if(is.na(df$temp[n])){return(NULL)}
+    if(df$temp[n] == 1){
+      return(cadd.scores[n, 1])
+    }
+    if(df$temp[n] == 2){
+      return(cadd.scores[n, 2])
+    }
+    if(df$temp[n] == 3){
+      return(cadd.scores[n, 3])
+    }
   })
 
   df$cadd.score <- lapply(df$cadd.score , toString)
@@ -166,33 +183,47 @@ addVariantAnnotations <- function(df, gene.of.interest.symbol){
   if (!exists("mcap")){
     mcap <<- getGScores("mcap.v1.0.hg19")
   }
-  tryCatch({mcap.scores <<- gscores(mcap, gr)
-    df$mcap.score <<- sapply(1:dim(df)[1], function(n){
-      if(is.na(df$temp[n])){return(NULL)}
-      if(df$temp[n] == 1){
-        return(mcap.scores[df$distance.from.start[n]]$default[1])
-      }
-      if(df$temp[n] == 2){
-        return(mcap.scores[df$distance.from.start[n]]$default[2])
-      }
-      if(df$temp[n] == 3){
-        return(mcap.scores[df$distance.from.start[n]]$default[3])
-      }
-  })},
-  error = function(e){
-    mcap.scores <<- scores(mcap, gr)
-    df$mcap.score <<- sapply(1:dim(df)[1], function(n){
-      if(is.na(df$temp[n])){return(NULL)}
-      if(df$temp[n] == 1){
-        return(mcap.scores[df$distance.from.start[n]]$scores1[1])
-      }
-      if(df$temp[n] == 2){
-        return(mcap.scores[df$distance.from.start[n]]$scores2[1])
-      }
-      if(df$temp[n] == 3){
-        return(mcap.scores[df$distance.from.start[n]]$scores3[1])
-      }
-    })
+  # tryCatch({mcap.scores <<- gscores(mcap, gr)
+  #   df$mcap.score <<- sapply(1:dim(df)[1], function(n){
+  #     if(is.na(df$temp[n])){return(NULL)}
+  #     if(df$temp[n] == 1){
+  #       return(mcap.scores[df$distance.from.start[n]]$default[1])
+  #     }
+  #     if(df$temp[n] == 2){
+  #       return(mcap.scores[df$distance.from.start[n]]$default[2])
+  #     }
+  #     if(df$temp[n] == 3){
+  #       return(mcap.scores[df$distance.from.start[n]]$default[3])
+  #     }
+  # })},
+  # error = function(e){
+  #   mcap.scores <<- scores(mcap, gr)
+  #   df$mcap.score <<- sapply(1:dim(df)[1], function(n){
+  #     if(is.na(df$temp[n])){return(NULL)}
+  #     if(df$temp[n] == 1){
+  #       return(mcap.scores[df$distance.from.start[n], 1])
+  #     }
+  #     if(df$temp[n] == 2){
+  #       return(mcap.scores[df$distance.from.start[n], 2])
+  #     }
+  #     if(df$temp[n] == 3){
+  #       return(mcap.scores[df$distance.from.start[n], 3])
+  #     }
+  #   })
+  # })
+
+  mcap.scores <- score(mcap, gr)[df$distance.from.start,]
+  df$mcap.score <- sapply(1:dim(df)[1], function(n){
+    if(is.na(df$temp[n])){return(NULL)}
+    if(df$temp[n] == 1){
+      return(mcap.scores[n, 1])
+    }
+    if(df$temp[n] == 2){
+      return(mcap.scores[n, 2])
+    }
+    if(df$temp[n] == 3){
+      return(mcap.scores[n, 3])
+    }
   })
 
   df$mcap.score <- lapply(df$mcap.score , toString)

@@ -16,7 +16,7 @@ Depends:
   GenomicRanges,
   IRanges,
   DelayedArray,
-  GenomicScores,
+  GenomicScores  (>= 1.4.0),
   httr,
   jsonlite,
   biomaRt,
