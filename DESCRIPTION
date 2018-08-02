@@ -11,12 +11,11 @@ Encoding: UTF-8
 LazyData: true
 biocViews:
 Depends: 
-  R,
   GenomeInfoDbData,
   GenomicRanges,
   IRanges,
   DelayedArray,
-  GenomicScores  (>= 1.4.0),
+  GenomicScores,
   httr,
   jsonlite,
   biomaRt,
